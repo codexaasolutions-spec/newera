@@ -1,20 +1,23 @@
-﻿import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+﻿const { execFileSync } = require('node:child_process');
+const fs = require('node:fs');
 
-try {
-  execFileSync('npm', ['run', 'build'], {
-    stdio: 'inherit',
-    shell: true
-  });
+async function start() {
+  try {
+    execFileSync('npm', ['run', 'build'], {
+      stdio: 'inherit'
+    });
 
-  const backendFile = './server/dist/index.js';
+    const backendFile = './server/dist/index.js';
 
-  if (!existsSync(backendFile)) {
-    throw new Error('Backend build missing: server/dist/index.js');
+    if (!fs.existsSync(backendFile)) {
+      throw new Error('Backend file not found: ' + backendFile);
+    }
+
+    require('./server/dist/index.js');
+  } catch (error) {
+    console.error('Server startup failed:', error);
+    process.exit(1);
   }
-
-  await import(backendFile);
-} catch (error) {
-  console.error('Server startup failed:', error);
-  process.exit(1);
 }
+
+start();
